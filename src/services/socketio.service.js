@@ -4,17 +4,13 @@ class SocketioService {
   socket;
   constructor() {}
 
-  setupSocketConnection() {
-    const uuid = self.crypto.randomUUID();
-
+  setupSocketConnection(token) {
     this.socket = io(process.env.VUE_APP_SOCKET_ENDPOINT, {
       auth: {
-        token: uuid,
+        token,
       },
     });
-    this.socket.on('my broadcast', data => {
-      console.log(data);
-    });
+    console.log(`Connecting socket...`);
   }
 
   disconnect() {
@@ -22,8 +18,16 @@ class SocketioService {
       this.socket.disconnect();
     }
   }
-  sendMessage() {
-    this.socket.emit('my message', 'Hello there from Vue.');
+  subscribeToMessages(cb) {
+    if (!this.socket) return true;
+    this.socket.on('message', msg => {
+      console.log('Room event received!');
+      return cb(null, msg);
+    });
+  }
+
+  sendMessage({ message, roomName }, cb) {
+    if (this.socket) this.socket.emit('message', { message, roomName }, cb);
   }
 }
 
