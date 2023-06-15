@@ -6,7 +6,7 @@
     </form>
     <div class="box">
       <div class="messages">
-        <div v-for="user in messages" :key="user.id">{{ user.name }}: {{ user.message }}</div>
+        <div v-for="(user, i) in messages" :key="i">{{ user.name }}: {{ user.message }}</div>
       </div>
       <div class="messages"></div>
       <form class="input-div" @submit.prevent="submitMessage">
@@ -36,10 +36,10 @@ export default {
   },
   methods: {
     submitToken() {
-      console.log(this.token);
+      this.token.id = self.crypto.randomUUID();
       SocketioService.setupSocketConnection(this.token);
       SocketioService.subscribeToMessages((err, data) => {
-        console.log(data);
+        console.log('data', data);
         this.messages.push(data);
       });
     },
